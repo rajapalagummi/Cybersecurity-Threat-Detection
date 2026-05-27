@@ -1,0 +1,39 @@
+{
+  "generated_at": "2026-05-27T03:23:33.710137",
+  "total_events": 1155,
+  "normal_events": 800,
+  "attack_events": 355,
+  "attack_rate_pct": 30.74,
+  "avg_anomaly_score_normal": 0.2808,
+  "avg_anomaly_score_attack": 0.9879,
+  "attack_types_detected": {
+    "ddos": 100,
+    "credential_stuffing": 60,
+    "port_scan": 50,
+    "ransomware": 40,
+    "brute_force": 30,
+    "sql_injection": 20,
+    "c2_beacon": 20,
+    "data_exfiltration": 15,
+    "privilege_escalation": 12,
+    "lateral_movement": 8
+  },
+  "graph_nodes": 960,
+  "graph_edges": 862,
+  "patterns_detected": [
+    {
+      "type": "high_out_degree",
+      "node": "10.0.2.221",
+      "value": 12,
+      "description": "10.0.2.221 connected to 12 destinations (port scan / lateral movement)",
+      "severity": "MEDIUM"
+    },
+    {
+      "type": "attack_edges_detected",
+      "count": 62,
+      "description": "62 confirmed attack connections in graph",
+      "severity": "CRITICAL"
+    }
+  ],
+  "high_severity_count": 1
+}

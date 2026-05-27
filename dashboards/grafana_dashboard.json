@@ -1,0 +1,106 @@
+{
+  "annotations": {"list": []},
+  "description": "Cybersecurity Threat Detection — Real-Time Network Monitoring",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "datasource": {"type": "sqlite", "uid": "network_events"},
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "green", "value": null},
+              {"color": "orange", "value": 0.5},
+              {"color": "red", "value": 0.75}
+            ]
+          },
+          "mappings": [],
+          "unit": "percentunit"
+        }
+      },
+      "gridPos": {"h": 4, "w": 6, "x": 0, "y": 0},
+      "id": 1,
+      "options": {"reduceOptions": {"calcs": ["lastNotNull"]}, "orientation": "auto", "textMode": "auto", "colorMode": "background"},
+      "title": "Avg Anomaly Score",
+      "type": "stat",
+      "targets": [{"rawSql": "SELECT avg(anomaly_score) as value FROM events WHERE timestamp > datetime('now', '-5 minutes')", "format": "table"}]
+    },
+    {
+      "datasource": {"type": "sqlite", "uid": "network_events"},
+      "fieldConfig": {"defaults": {"color": {"mode": "fixed", "fixedColor": "red"}}},
+      "gridPos": {"h": 4, "w": 6, "x": 6, "y": 0},
+      "id": 2,
+      "options": {"reduceOptions": {"calcs": ["lastNotNull"]}, "colorMode": "background"},
+      "title": "Attack Events (Last 5m)",
+      "type": "stat",
+      "targets": [{"rawSql": "SELECT count(*) as value FROM events WHERE is_attack=1 AND timestamp > datetime('now', '-5 minutes')", "format": "table"}]
+    },
+    {
+      "datasource": {"type": "sqlite", "uid": "network_events"},
+      "fieldConfig": {"defaults": {}},
+      "gridPos": {"h": 4, "w": 6, "x": 12, "y": 0},
+      "id": 3,
+      "title": "Total Events",
+      "type": "stat",
+      "targets": [{"rawSql": "SELECT count(*) as value FROM events WHERE timestamp > datetime('now', '-5 minutes')", "format": "table"}]
+    },
+    {
+      "datasource": {"type": "sqlite", "uid": "network_events"},
+      "fieldConfig": {"defaults": {"color": {"mode": "fixed", "fixedColor": "orange"}}},
+      "gridPos": {"h": 4, "w": 6, "x": 18, "y": 0},
+      "id": 4,
+      "title": "High Anomaly Alerts (Score > 0.7)",
+      "type": "stat",
+      "targets": [{"rawSql": "SELECT count(*) as value FROM events WHERE anomaly_score > 0.7 AND timestamp > datetime('now', '-5 minutes')", "format": "table"}]
+    },
+    {
+      "datasource": {"type": "sqlite", "uid": "network_events"},
+      "fieldConfig": {
+        "defaults": {"custom": {"lineWidth": 2}},
+        "overrides": [
+          {"matcher": {"id": "byName", "options": "anomaly_score"}, "properties": [{"id": "color", "value": {"fixedColor": "red", "mode": "fixed"}}]},
+          {"matcher": {"id": "byName", "options": "is_attack"}, "properties": [{"id": "color", "value": {"fixedColor": "orange", "mode": "fixed"}}]}
+        ]
+      },
+      "gridPos": {"h": 8, "w": 16, "x": 0, "y": 4},
+      "id": 5,
+      "options": {"tooltip": {"mode": "multi"}, "legend": {"displayMode": "list"}},
+      "title": "Real-Time Anomaly Score Timeline",
+      "type": "timeseries",
+      "targets": [{"rawSql": "SELECT datetime(timestamp) as time, anomaly_score, is_attack FROM events ORDER BY timestamp DESC LIMIT 200", "format": "time_series"}]
+    },
+    {
+      "datasource": {"type": "sqlite", "uid": "network_events"},
+      "fieldConfig": {"defaults": {}},
+      "gridPos": {"h": 8, "w": 8, "x": 16, "y": 4},
+      "id": 6,
+      "title": "Attack Types (Last Hour)",
+      "type": "piechart",
+      "targets": [{"rawSql": "SELECT attack_type as label, count(*) as value FROM events WHERE is_attack=1 AND attack_type != 'none' GROUP BY attack_type ORDER BY value DESC", "format": "table"}]
+    },
+    {
+      "datasource": {"type": "sqlite", "uid": "network_events"},
+      "fieldConfig": {"defaults": {}},
+      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 12},
+      "id": 7,
+      "options": {"showHeader": true, "sortBy": [{"desc": true, "displayName": "anomaly_score"}]},
+      "title": "Latest High-Anomaly Events",
+      "type": "table",
+      "targets": [{"rawSql": "SELECT timestamp, src_ip, dst_ip, service, event_type, status, round(anomaly_score,3) as anomaly_score, attack_type FROM events WHERE anomaly_score > 0.5 ORDER BY timestamp DESC LIMIT 20", "format": "table"}]
+    }
+  ],
+  "refresh": "5s",
+  "schemaVersion": 38,
+  "tags": ["cybersecurity", "threat-detection", "network-monitoring"],
+  "time": {"from": "now-15m", "to": "now"},
+  "timepicker": {},
+  "title": "Cybersecurity Threat Detection",
+  "uid": "cybersec-001",
+  "version": 1
+}

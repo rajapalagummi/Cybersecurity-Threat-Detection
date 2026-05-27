@@ -1,0 +1,12 @@
+apiVersion: 1
+
+datasources:
+  - name: NetworkEvents
+    type: frser-sqlite-datasource
+    uid: network_events
+    access: proxy
+    url: ""
+    jsonData:
+      path: /data/events.db
+    isDefault: true
+    editable: true

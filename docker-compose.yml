@@ -1,0 +1,33 @@
+version: "3.9"
+
+services:
+  grafana:
+    image: grafana/grafana:latest
+    container_name: cybersec_grafana
+    ports:
+      - "3001:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./data:/data
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=cybersec123
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer
+    restart: unless-stopped
+
+  neo4j:
+    image: neo4j:5-community
+    container_name: cybersec_neo4j
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    environment:
+      - NEO4J_AUTH=neo4j/cybersec123
+    volumes:
+      - neo4j_data:/data
+    restart: unless-stopped
+
+volumes:
+  grafana_data:
+  neo4j_data:

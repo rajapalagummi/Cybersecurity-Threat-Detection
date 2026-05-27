@@ -1,0 +1,7 @@
+{
+  "threshold": 1.0079288482666016,
+  "input_dim": 8,
+  "training_samples": 800,
+  "trained_at": "2026-05-27T03:23:02.858959",
+  "final_loss": 0.49504220485687256
+}
