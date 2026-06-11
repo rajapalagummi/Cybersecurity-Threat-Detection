@@ -91,33 +91,31 @@ class NetworkAutoencoder(nn.Module):
 ### 2. Feature Engineering — 8 Network Features
 
 ```python
-features["bytes_sent_log"]   = np.log1p(df["bytes_sent"])     # Volume
-features["bytes_recv_log"]   = np.log1p(df["bytes_recv"])     # Response size
-features["duration_log"]     = np.log1p(df["duration_ms"])    # Connection time
-features["dst_port_norm"]    = df["dst_port"] / 65535.0       # Destination port
-features["src_port_norm"]    = df["src_port"] / 65535.0       # Source port
-features["is_external_src"]  = ...                             # External source flag
-features["is_external_dst"]  = ...                             # External dest flag
-features["is_failure"]       = (df["status"] == "failed")     # Auth failure
+features["bytes_sent_log"]   = np.log1p(df["bytes_sent"])
+features["bytes_recv_log"]   = np.log1p(df["bytes_recv"])
+features["duration_log"]     = np.log1p(df["duration_ms"])
+features["dst_port_norm"]    = df["dst_port"] / 65535.0
+features["src_port_norm"]    = df["src_port"] / 65535.0
+features["is_external_src"]  = ...
+features["is_external_dst"]  = ...
+features["is_failure"]       = (df["status"] == "failed")
 ```
 
 ### 3. Ensemble Scoring
 
 ```python
 ae_scores    = autoencoder.reconstruction_error(X) / threshold
-iso_scores   = -isolation_forest.score_samples(X)  # normalized
-final_scores = 0.6 * ae_scores + 0.4 * iso_scores  # weighted ensemble
+iso_scores   = -isolation_forest.score_samples(X)
+final_scores = 0.6 * ae_scores + 0.4 * iso_scores
 ```
 
 ### 4. Graph Attack Pattern Detection
 
 ```python
-# High out-degree = port scanner or C2 master
 for node in G.nodes():
     if G.out_degree(node) > 10:
         findings.append({"type": "high_out_degree", "severity": "HIGH"})
 
-# Betweenness centrality = pivot/relay node
 centrality = nx.betweenness_centrality(G)
 high_pivots = [(n, c) for n, c in centrality.items() if c > 0.3]
 ```
@@ -156,17 +154,16 @@ high_pivots = [(n, c) for n, c in centrality.items() if c > 0.3]
 
 ```bash
 # 1. Setup
-cd ~/Desktop/Projects/cybersecurity-threat-detection
 python3 -m venv venv && source venv/bin/activate
 pip install -r requirements.txt
 
-# 2. Run full pipeline (generates baseline + trains model + scores + report)
+# 2. Run full pipeline
 python3 main.py
 
 # 3. Start dashboards
 docker-compose up -d
-# Grafana:  http://localhost:3001  (admin / cybersec123)
-# Neo4j:    http://localhost:7474  (neo4j / cybersec123)
+# Grafana:  http://localhost:3001  (credentials in docker-compose.yml)
+# Neo4j:    http://localhost:7474  (credentials in docker-compose.yml)
 
 # 4. Live demo — Terminal 1: continuous traffic
 python3 -c "from src.network_simulator import run_simulator; run_simulator(3.0)"
@@ -180,19 +177,6 @@ python3 inject_attack.py --type all
 # 6. Load Neo4j graph
 python3 src/neo4j_loader.py
 # Query in Neo4j browser: MATCH p=(a)-[r:CONNECTED_TO]->(b) WHERE r.is_attack=true RETURN p LIMIT 50
-```
-
----
-
-## Push to GitHub
-
-```bash
-git init
-git add .
-git commit -m "feat: Cybersecurity Threat Detection — PyTorch autoencoder, 10 attack types, Neo4j graph"
-git remote add origin https://github.com/rajapalagummi/Cybersecurity-Threat-Detection.git
-git branch -M main
-git push -u origin main
 ```
 
 ---
